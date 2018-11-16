@@ -1,0 +1,59 @@
+ <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sym.local{% endblock %}</title>
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('build/css/app.css') }}">
+    {% endblock %}
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark navbar-expand-md sticky-top bg-dark p-0">
+
+    <div class="w-100 order-1 order-md-0">
+     
+        <ul class="navbar-nav px-3">
+           <a class="navbar-brand col-sm-3 col-md-2 mr-0"
+       href="{{ path('cms_index') }}">Forum</a>
+
+            {% if is_granted('ROLE_USER') and 'ROLE_USER' %}
+                <li class="nav-item text-nowrap">
+                    <a class="nav-link" href="{{ path('cms_add') }}">Dodaj</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="order-2 order-md-1">
+        <ul class="navbar-nav px-3">
+            {% if is_granted('ROLE_USER') %}
+                <li class="nav-item text-nowrap">
+                    <a class="nav-link"
+                       href="#">{{ app.user.fullName }}</a>
+                </li>
+                <li class="nav-item text-nowrap">
+                    <a class="nav-link" href="{{ path('security_logout') }}">Wyloguj</a>
+                </li>
+            {% else %}
+                <li class="nav-item text-nowrap">
+                    <a class="nav-link" href="{{ path('security_login') }}">Zaloguj</a>
+                    <a class="nav-link" href="{{ path('user_register') }}">Rejestracja</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+<br>
+<main role="main" class="container">
+    {% block body %}
+
+    {% endblock %}
+        
+  
+</main>
+{% block javascripts %}
+    <script src="{{ asset('build/js/app.js') }}"></script>
+{% endblock %}
+</body>
+</html>

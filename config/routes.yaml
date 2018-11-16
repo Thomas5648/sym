@@ -1,0 +1,13 @@
+# index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+# app:
+#     path: /
+#     controller: App\Controller\TytulowaController::index
+# app:
+#     path: 
+#     controller: App\Controller\CmsController::index
+
+    # cms_add:
+    # path:     /
+    # controller: App\Controller\CmsController::add
