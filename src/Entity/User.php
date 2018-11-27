@@ -59,6 +59,11 @@ class User implements UserInterface, \Serializable
     private $fullname;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Jednostka", mappedBy="likedBy")
+     */
+    private $postLiked;
+
+    /**
      * @var array
      * @ORM\Column(type="simple_array")
      */
@@ -69,10 +74,31 @@ class User implements UserInterface, \Serializable
      */
     private $posts;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="following")
+     */
+    private $followers;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="followers")
+     * @ORM\JoinTable(name="following",
+     *      joinColumns={
+     *          @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *          @ORM\JoinColumn(name="following_user_id", referencedColumnName="id")
+     * }
+     * )
+     */
+    private $following;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
         $this->roles = [self::ROLE_USER];
+        $this->followers = new ArrayCollection();
+        $this->following = new ArrayCollection();
+        $this->postsLiked = new ArrayCollection();
     }
 
     public function getRoles()
@@ -216,8 +242,6 @@ class User implements UserInterface, \Serializable
 
         return $this;
     }
-
-
     
     /**
      * Get the value of posts
@@ -225,5 +249,38 @@ class User implements UserInterface, \Serializable
     public function getPosts()
     {
         return $this->posts;
+    }
+
+    /**
+     * @return Collection
+     */ 
+    public function getFollowers()
+    {
+        return $this->followers;
+    }
+
+    /**
+     * @return Collection{
+     */ 
+    public function getFollowing()
+    {
+        return $this->following;
+    }
+
+    public function follow(User $userToFollow)
+    {
+        if ($this->getFollowing()->contains($userToFollow)) {
+            return;
+        }
+
+        $this->getFollowing()->add($userToFollow);
+    }
+
+    /**
+     * @eturn Collection
+     */
+    public function getPostsLiked()
+    {
+        return $this->postsLiked;
     }
 }

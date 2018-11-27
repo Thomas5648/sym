@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use App\Repository\UserRepository;
 
 
     /**
@@ -67,10 +69,28 @@ class CmsController
     /**
      * @Route("/", name="cms_index")
      */
-    public function index()
+    public function index(TokenStorageInterface $tokenStorage, UserRepository $userRepository)
     {
+
+        $currentUser = $tokenStorage->getToken()->getUser();
+
+        $userToFollow = [];
+
+        if($currentUser instanceof User){
+            $posts = $this->jednostkaRepository->findAllByUsers($currentUser->getFollowing());
+
+            $userToFollow = count($posts) === 0 ? 
+            $userRepository->findAllWithMoreThan5PostsExceptUser(
+                $currentUser
+            ): [];
+
+        }else{
+            $posts = $this->jednostkaRepository->findBy([], ['time' =>'DESC']);
+        }
+
         $html = $this->twig->render('index.html.twig', [
-            'posts' => $this->jednostkaRepository->findBy([], ['time' =>'DESC'])
+            'posts' => $posts,
+            'userToFollow' => $userToFollow
         ]);
 
         return new Response($html);
@@ -149,12 +169,12 @@ class CmsController
      */
     public function userPost(User $userWithPosts)
     {
-        $html = $this->twig->render('index.html.twig', [
+        $html = $this->twig->render('user-post.html.twig', [
             'posts' => $this->jednostkaRepository->findBy(
                 ['user'=> $userWithPosts], 
-                ['time' =>'DESC'])
-        ]);
-
+                ['time' =>'DESC']), 
+            'user' => $userWithPosts,
+            ]);
         return new Response($html);
     }
 
@@ -166,7 +186,7 @@ class CmsController
     {
 
         return new Response(
-            $this->twig->render('raw-post.html.twig',
+            $this->twig->render('post.html.twig',
             [
                 'post' => $post
             ])

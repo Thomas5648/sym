@@ -7,7 +7,14 @@
         </div>
     {% endfor %}
 
-   
+        {% if userToFollow|length > 0 %}
+            <p>Nikogo nie obsewujesz, możesz zaobserwować poprzez kliknięcie</p>
+            {% for userToFollow in userToFollow %}
+               <a href="{{path('following_follow',{'id':userToFollow.id})}}">
+                 @{{userToFollow.username}},</a>
+            {% endfor %}      
+        {% else %}
+
         <h6 class="border-bottom border-gray pb-2 mb-0">Recent updates</h6>
 
         {% for post in posts %}
@@ -22,4 +29,5 @@
                 {% endif %}
             </small>
         {% endfor %}
+        {% endif %}
 {% endblock %}

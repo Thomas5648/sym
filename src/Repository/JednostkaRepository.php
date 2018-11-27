@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Jednostka;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @method Jednostka|null find($id, $lockMode = null, $lockVersion = null)
@@ -47,4 +48,14 @@ class JednostkaRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findAllByUsers(Collection $user){
+        $qb = $this->createQueryBuilder('p');
+        return $qb->select('p')
+            ->where('p.user IN (:following)')
+            ->setParameter('following', $user)
+            ->orderBy('p.time', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

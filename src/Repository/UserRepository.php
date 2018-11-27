@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\QueryBuilder;
+
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -47,4 +49,31 @@ class UserRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findAllWithMoreThan5Posts()
+    {
+            $this->getFindAllWithMoreThan5PostsQuery()
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithMoreThan5PostsExceptUser(User $user)
+    {
+        return $this->findAllWithMoreThan5PostsQuery()
+            ->andHaving('u != :user')
+            ->setParameter('user',$user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    private function findAllWithMoreThan5PostsQuery():QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('u');
+
+        return $qb->select('u')
+            ->innerJoin('u.posts', 'mp')
+            ->groupBy('u')
+            ->having('count(mp) > 5');
+    }
+
 }
